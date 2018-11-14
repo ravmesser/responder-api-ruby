@@ -122,6 +122,16 @@ class Responder
   end
   # endregion Personal Fields
 
+  def sendRequest(type, object_name, id, args = {})
+    if (!(args == {}) )
+      JSON_obj = {object_name => 
+        JSON.generate(args)
+      }
+    end
 
+    response = @access_token.request(:type, "/v1.0/lists/"  + id.to_s + "/personal_fields?method=delete" , JSON_obj)
+    rsp = JSON.parse(response.body)
+    return rsp
+  end
 
 end
