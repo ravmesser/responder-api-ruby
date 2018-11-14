@@ -1,0 +1,17 @@
+PATH
+  remote: .
+  specs:
+    responder-api (1.0.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  x86-mingw32
+
+DEPENDENCIES
+  responder-api!
+
+BUNDLED WITH
+   1.17.1
