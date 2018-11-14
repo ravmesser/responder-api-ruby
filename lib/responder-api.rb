@@ -59,23 +59,49 @@ class Responder
   # endregion Lists
 
 
+
+
   # region Subscribers
-  def get_subscribers
-
+  def get_subscribers(id)
+    response = @access_token.request(:get, "/v1.0/lists/" + id.to_s + "/subscribers")
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
-  def create_subscriber
-    
+  def create_subscribers(id, args = {} )
+    post_JSON = {'subscribers' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/subscribers" , post_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
-  def edit_subscriber(id)
-    
+  def edit_subscribers(id, args)
+    put_JSON = {'subscribers' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:put, "/v1.0/lists/"  + id.to_s + "/subscribers" , put_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
-  def delete_subscriber(id)
-    
+  def delete_subscribers(id, args)
+    delete_JSON = {'subscribers' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/subscribers?method=delete" , delete_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
   # endregion Subscribers
+
+
+
+
 
   # region Personal Fields
   def get_personal_fields
