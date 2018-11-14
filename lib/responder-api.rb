@@ -23,14 +23,9 @@ class Responder
     return rsp
   end
 
-  def create_list(desc, sm, se, sa)
+  def create_list(args = {})
     post_JSON = {'info' => 
-      JSON.generate({
-        'DESCRIPTION': desc,
-        'SENDER_NAME': sm,
-        'SENDER_EMAIL': se,
-        'SENDER_ADDRESS': sa
-      })
+      JSON.generate(args)
     }
 
     response = @access_token.request(:post, "/v1.0/lists", post_JSON)
@@ -39,11 +34,9 @@ class Responder
 
   end
 
-  def edit_list(id, desc)
+  def edit_list(id, args = {})
     put_JSON = {'info' => 
-      JSON.generate({
-        'DESCRIPTION': desc
-      })
+      JSON.generate(args)
     }
 
     response = @access_token.request(:put, "/v1.0/lists/" + id.to_s , put_JSON)
@@ -104,12 +97,20 @@ class Responder
 
 
   # region Personal Fields
-  def get_personal_fields
-
+  def get_personal_fields(id)
+    response = @access_token.request(:get, "/v1.0/lists/" + id.to_s + "/personal_fields")
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
-  def create_personal_field
-    
+  def create_personal_field(id, args = {} )
+    post_JSON = {'personal_fields' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/personal_fields" , post_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
   def edit_personal_field(id)
