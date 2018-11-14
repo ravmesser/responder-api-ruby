@@ -103,7 +103,7 @@ class Responder
     return rsp
   end
 
-  def create_personal_field(id, args = {} )
+  def create_personal_fields(id, args = {} )
     post_JSON = {'personal_fields' => 
       JSON.generate(args)
     }
@@ -113,14 +113,27 @@ class Responder
     return rsp
   end
 
-  def edit_personal_field(id)
-    
+  def edit_personal_fields(id, args)
+    put_JSON = {'personal_fields' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:put, "/v1.0/lists/"  + id.to_s + "/personal_fields" , put_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
 
-  def delete_personal_field(id)
-    
+  def delete_personal_fields(id, args)
+    delete_JSON = {'personal_fields' => 
+      JSON.generate(args)
+    }
+
+    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/personal_fields?method=delete" , delete_JSON)
+    rsp = JSON.parse(response.body)
+    return rsp
   end
   # endregion Personal Fields
+
 
 
 
