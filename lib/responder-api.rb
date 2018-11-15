@@ -32,6 +32,7 @@ class Responder
     rsp = JSON.parse(response.body)
     return rsp
 
+    # return sendRequest(:post, 'info', '', args)
   end
 
   def edit_list(id, args = {})
@@ -134,14 +135,18 @@ class Responder
   end
   # endregion Personal Fields
 
-  def sendRequest(type, object_name, id, args = {})
+  def sendRequest(type, object_name = "", id = "", args = {})
     if (!(args == {}) )
-      JSON_obj = {object_name => 
+      json_obj = { object_name => 
         JSON.generate(args)
       }
     end
 
-    response = @access_token.request(:type, "/v1.0/lists/"  + id.to_s + "/personal_fields?method=delete" , JSON_obj)
+    object_name = '' if object_name == 'info'
+    object_name = "/" + object_name unless object_name == ''
+    # object_name == '' ? () : (object_name = "/" + object_name)
+
+    response = @access_token.request(type, "/v1.0/lists/"  + id.to_s + object_name , json_obj)
     rsp = JSON.parse(response.body)
     return rsp
   end
