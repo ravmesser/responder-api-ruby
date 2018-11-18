@@ -44,18 +44,10 @@ class ResponderTest < Minitest::Test
         }
       }
       
-      res = @responder.create_subscribers(@list_id, new_subscriber)
-      if assert(res.class == Hash, "this Subscriber isn't Hash class")
-        isCreated = true
-        isCreated = false unless assert(res["ERRORS"].empty?, "the Subscribers doesn't created - ERRORS")
-        isCreated = false unless assert(res["EMAILS_INVALID"].empty?, "the Subscribers doesn't created - EMAILS_INVALID")
-        isCreated = false unless assert(res["EMAILS_BANNED"].empty?, "the Subscribers doesn't created - EMAILS_BANNED")
-        isCreated = false unless assert(res["PHONES_INVALID"].empty?, "the Subscribers doesn't created - PHONES_INVALID")
-        isCreated = false unless assert(res["PHONES_EXISTING"].empty?, "the Subscribers doesn't created - PHONES_EXISTING")
-        isCreated = false unless assert(res["BAD_PERSONAL_FIELDS"].empty?, "the Subscribers doesn't created - BAD_PERSONAL_FIELDS")
-        @subscribers_ids = []
-        @subscribers_ids = res["SUBSCRIBERS_CREATED"] if isCreated == true
-      end
+      res = @responder.create_subscribers(@list_id ,new_subscriber)
+      pp res
+      keys_array = ["ERRORS", "EMAILS_INVALID", "EMAILS_BANNED", "PHONES_INVALID", "PHONES_EXISTING", "BAD_PERSONAL_FIELDS"]
+      @subscribers_ids = res["SUBSCRIBERS_CREATED"] if hash_empty(res, keys_array, "create_subscribers") if assert(res.class == Hash, "this Subscriber isn't Hash class")
       puts "subscribers ids:"
       puts @subscribers_ids
       puts "end setup \n"
@@ -64,7 +56,7 @@ class ResponderTest < Minitest::Test
   def test_delete_subscribers
     delete_subscribers = {
       0 => { 'EMAIL': "sub1@email.com" },
-      1 => { 'ID': @subscribers_ids[1] }
+      1 => { 'ID': @subscribers_ids[1].to_i }
     }      
     res = @responder.delete_subscribers( @list_id , delete_subscribers)
     pp res
@@ -77,7 +69,7 @@ class ResponderTest < Minitest::Test
   def hash_empty(res, keys, test_name)
     is_empty = true
     keys.each do |key_name|
-      is_empty = false if assert(res[key_name].empty?, "#{key_name} isn't empty in #{test_name}() ")
+      is_empty = false unless assert(res[key_name].empty?, "#{key_name} isn't empty in #{test_name}() ")
     end
 
     return is_empty

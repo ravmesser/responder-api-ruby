@@ -44,17 +44,10 @@ class ResponderTest < Minitest::Test
         }
       }
       
-      res = @responder.create_subscribers(@list_id, new_subscriber)
+      res = @responder.create_subscribers(@list_id ,new_subscriber)
       if assert(res.class == Hash, "this Subscriber isn't Hash class")
-        isCreated = true
-        isCreated = false unless assert(res["ERRORS"].empty?, "the Subscribers doesn't created - ERRORS")
-        isCreated = false unless assert(res["EMAILS_INVALID"].empty?, "the Subscribers doesn't created - EMAILS_INVALID")
-        isCreated = false unless assert(res["EMAILS_BANNED"].empty?, "the Subscribers doesn't created - EMAILS_BANNED")
-        isCreated = false unless assert(res["PHONES_INVALID"].empty?, "the Subscribers doesn't created - PHONES_INVALID")
-        isCreated = false unless assert(res["PHONES_EXISTING"].empty?, "the Subscribers doesn't created - PHONES_EXISTING")
-        isCreated = false unless assert(res["BAD_PERSONAL_FIELDS"].empty?, "the Subscribers doesn't created - BAD_PERSONAL_FIELDS")
-        @subscribers_ids = []
-        @subscribers_ids = res["SUBSCRIBERS_CREATED"] if isCreated == true
+        keys_array = ["ERRORS", "EMAILS_INVALID", "EMAILS_BANNED", "PHONES_INVALID", "PHONES_EXISTING", "BAD_PERSONAL_FIELDS"]
+        @subscribers_ids = res["SUBSCRIBERS_CREATED"] if hash_empty(res, keys_array, "create_subscribers")
       end
       puts "subscribers ids:"
       puts @subscribers_ids
@@ -98,17 +91,4 @@ class ResponderTest < Minitest::Test
       end 
     end
   end
-
-  def hash_empty(res, keys, test_name)
-    is_empty = true
-    keys.each do |key_name|
-      is_empty = false if assert(res[key_name].empty?, "#{key_name} isn't empty in #{test_name}() ")
-    end
-
-    return is_empty
-  end
 end
-
-  #   #delete
-  #   res = @responder.delete_list(list_id)
-  #   puts res if assert(res["DELETED_LIST_ID"] == list_id , "the list doesn't deleted") if assert(res.class == Hash, "this is not Hash class")
