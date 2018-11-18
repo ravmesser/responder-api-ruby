@@ -149,9 +149,7 @@ class Responder
   # Arguments:
   #   id: (int)
   def get_personal_fields(id)
-    response = @access_token.request(:get, "/v1.0/lists/" + id.to_s + "/personal_fields")
-    rsp = JSON.parse(response.body)
-    return rsp
+    return sendRequest(:get, '', "/" + id.to_s + "/personal_fields", {})
   end
 
   # create new personal fields in specific list
@@ -164,13 +162,7 @@ class Responder
   #   id: (int)
   #   args: (Hash)
   def create_personal_fields(id, args = {} )
-    post_JSON = {'personal_fields' => 
-      JSON.generate(args)
-    }
-
-    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/personal_fields" , post_JSON)
-    rsp = JSON.parse(response.body)
-    return rsp
+    return sendRequest(:post, 'personal_fields', "/"  + id.to_s + "/personal_fields", args)
   end
 
   # edit personal fields of specific list
@@ -183,13 +175,7 @@ class Responder
   #   id: (int)
   #   args: (Hash)
   def edit_personal_fields(id, args)
-    put_JSON = {'personal_fields' => 
-      JSON.generate(args)
-    }
-
-    response = @access_token.request(:put, "/v1.0/lists/"  + id.to_s + "/personal_fields" , put_JSON)
-    rsp = JSON.parse(response.body)
-    return rsp
+    return sendRequest(:put, 'personal_fields', "/"  + id.to_s + "/personal_fields", args)
   end
 
   # delete personal fields of specific list
@@ -202,13 +188,7 @@ class Responder
   #   id: (int)
   #   args: (Hash)
   def delete_personal_fields(id, args)
-    delete_JSON = {'personal_fields' => 
-      JSON.generate(args)
-    }
-
-    response = @access_token.request(:post, "/v1.0/lists/"  + id.to_s + "/personal_fields?method=delete" , delete_JSON)
-    rsp = JSON.parse(response.body)
-    return rsp
+    return sendRequest(:post, 'personal_fields', "/"  + id.to_s + "/personal_fields?method=delete", args)
   end
 
 
@@ -239,7 +219,6 @@ class Responder
   end
 
   private :sendRequest
-
 
 
 end
