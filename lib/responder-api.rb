@@ -7,20 +7,19 @@ require 'uri'
 
 # gem class name Responder
 class Responder
-
   # initialize new Responder Object
   #
   # Example:
   #   >> Responder.new(MNFDKRHUI2398RJ2O3R, NF932URH29837RY923JN, NF2983HFOIMNW2983H32, NFG8927RH238RH2)
   #
   # Arguments:
-  #   ck: (String) Client Key
-  #   cs: (String) Client Secret
-  #   uk: (String) User Key
-  #   us: (String) User Secret
-  def initialize(ck, cs, uk, us)
-    consumer = OAuth::Consumer.new(ck,cs, :site => "http://api.responder.co.il")
-    @access_token = OAuth::AccessToken.new(consumer, uk, us)
+  #   client_key: (String) Client Key
+  #   client_secret: (String) Client Secret
+  #   user_key: (String) User Key
+  #   user_secret: (String) User Secret
+  def initialize(client_key, client_secret, user_key, user_secret)
+    consumer = OAuth::Consumer.new(client_key, client_secret, site: 'http://api.responder.co.il')
+    @access_token = OAuth::AccessToken.new(consumer, user_key, user_secret)
   end
 
   # <!----------- LISTS -----------!>
@@ -32,7 +31,7 @@ class Responder
   #   => { "LISTS" => [{}, {}, ... ] }
   #
   def get_lists
-    return sendRequest(:get, '', '', {})
+    send_request(:get, '', '', [], {})
   end
 
   # get list by id
@@ -44,7 +43,7 @@ class Responder
   # Arguments:
   #   id: (int)
   def get_list(id)
-    return sendRequest(:get, '', "?list_ids=" + id.to_s, {})
+    send_request(:get, '', '?', ['list_ids', id.to_s], {})
   end
 
   # create new list
@@ -56,7 +55,7 @@ class Responder
   # Arguments:
   #   args: (Hash)
   def create_list(args = {})
-    return sendRequest(:post, 'info', '', args)
+    send_request(:post, 'info', '', [], args)
   end
 
   # edit list by id
@@ -69,7 +68,7 @@ class Responder
   #   id: (int)
   #   args: (Hash)
   def edit_list(id, args = {})
-    return sendRequest(:put, 'info', "/" + id.to_s, args)
+    send_request(:put, 'info', '/' + id.to_s, [], args)
   end
 
   # delete list by id
@@ -81,8 +80,7 @@ class Responder
   # Arguments:
   #   id: (int)
   def delete_list(id)
-    return sendRequest(:delete, 'info', "/" + id.to_s, {})
-
+    send_request(:delete, 'info', '/' + id.to_s, [], {})
   end
 
   # <!----------- SUBSCRIBERS -----------!>
@@ -96,7 +94,7 @@ class Responder
   # Arguments:
   #   id: (int)
   def get_subscribers(id)
-    return sendRequest(:get, '', "/" + id.to_s + "/subscribers", {})
+    send_request(:get, '', '/' + id.to_s + '/subscribers', [], {})
   end
 
   # create new subscribers in specific list
@@ -108,34 +106,34 @@ class Responder
   # Arguments:
   #   id: (int)
   #   args: (Hash)
-  def create_subscribers(id, args = {} )
-    return sendRequest(:post, 'subscribers', "/" + id.to_s + "/subscribers", args)
+  def create_subscribers(id, args = {})
+    send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
   end
 
   # edit subscribers of specific list
   #
   # Example:
-  #   >> Responder.edit_subscribers(123456, {0 => {'IDENTIFIER': "sub1@email.com", 'NAME': "sub1NewName"}, 1 => {'IDENTIFIER': "sub2", 'NAME': "sub2"}} ) 
-  #   => {"SUBSCRIBERS_UPDATED": [], "INVALID_SUBSCRIBER_IDENTIFIERS": [], "EMAILS_INVALID": [], "EMAILS_EXISTED": ["johnsmith@gmail.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }}  
+  #   >> Responder.edit_subscribers(123456, {0 => {'IDENTIFIER': "sub1@email.com", 'NAME': "sub1NewName"}, 1 => {'IDENTIFIER': "sub2", 'NAME': "sub2"}} )
+  #   => {"SUBSCRIBERS_UPDATED": [], "INVALID_SUBSCRIBER_IDENTIFIERS": [], "EMAILS_INVALID": [], "EMAILS_EXISTED": ["johnsmith@gmail.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }}
   #
   # Arguments:
   #   id: (int)
   #   args: (Hash)
   def edit_subscribers(id, args)
-    return sendRequest(:put, 'subscribers', "/" + id.to_s + "/subscribers", args)
+    send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
   end
 
   # delete subscribers of specific list
   #
   # Example:
-  #   >> Responder.delete_subscribers(123456, {0 => { 'EMAIL': "sub8@email.com" }, 1 => { 'ID': 323715811 }} ) 
+  #   >> Responder.delete_subscribers(123456, {0 => { 'EMAIL': "sub8@email.com" }, 1 => { 'ID': 323715811 }} )
   #   => {"INVALID_SUBSCRIBER_IDS": [], "INVALID_SUBSCRIBER_EMAILS": [], "DELETED_SUBSCRIBERS": {} }
   #
   # Arguments:
   #   id: (int)
   #   args: (Hash)
   def delete_subscribers(id, args)
-    return sendRequest(:post, 'subscribers', "/"  + id.to_s + "/subscribers?method=delete", args)
+    send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers?', %w[method delete], args)
   end
 
   # <!----------- PERSONAL FIELDS -----------!>
@@ -149,7 +147,7 @@ class Responder
   # Arguments:
   #   id: (int)
   def get_personal_fields(id)
-    return sendRequest(:get, '', "/" + id.to_s + "/personal_fields", {})
+    send_request(:get, '', '/' + id.to_s + '/personal_fields', [], {})
   end
 
   # create new personal fields in specific list
@@ -161,8 +159,8 @@ class Responder
   # Arguments:
   #   id: (int)
   #   args: (Hash)
-  def create_personal_fields(id, args = {} )
-    return sendRequest(:post, 'personal_fields', "/"  + id.to_s + "/personal_fields", args)
+  def create_personal_fields(id, args = {})
+    send_request(:post, 'personal_fields', '/' + id.to_s + '/personal_fields', [], args)
   end
 
   # edit personal fields of specific list
@@ -175,29 +173,27 @@ class Responder
   #   id: (int)
   #   args: (Hash)
   def edit_personal_fields(id, args)
-    return sendRequest(:put, 'personal_fields', "/"  + id.to_s + "/personal_fields", args)
+    send_request(:put, 'personal_fields', '/'  + id.to_s + '/personal_fields', [], args)
   end
 
   # delete personal fields of specific list
   #
   # Example:
-  #   >> Responder.delete_personal_fields(123456, {0 => { 'ID': 1234 }, 1 => { 'ID': 5678 }} ) 
+  #   >> Responder.delete_personal_fields(123456, {0 => { 'ID': 1234 }, 1 => { 'ID': 5678 }} )
   #   => {"DELETED_FIELDS": [], "INVALID_FIELD_IDS" : [] }
   #
   # Arguments:
   #   id: (int)
   #   args: (Hash)
   def delete_personal_fields(id, args)
-    return sendRequest(:post, 'personal_fields', "/"  + id.to_s + "/personal_fields?method=delete", args)
+    send_request(:post, 'personal_fields', '/' + id.to_s + '/personal_fields?', %w[method delete], args)
   end
-
-
 
   # privare method
   # common code to send the requests
   #
   # Example:
-  #   >> sendRequest(:get, 'info', '?list_ids=123456', {} ) 
+  #   >> send_request(:get, 'info', '?list_ids=123456', {} )
   #   => {}
   #
   # Arguments:
@@ -205,20 +201,19 @@ class Responder
   #   object_name: (string) - ('info', 'subscribers', 'personal_fields')
   #   query: (string)
   #   args: (Hash)
-  def sendRequest(type, object_name = "", query = "", args = {})
-    if (!(args == {}) )
-      json_obj = { object_name => 
-        JSON.generate(args)
-      }
+  def send_request(type, object_name = '', path = '', query = [], args = {})
+    unless args == {}
+      json_obj = { object_name =>
+        JSON.generate(args) }
     end
 
-    query = URI.escape("/v1.0/lists" + query)
-    response = @access_token.request(type, query, json_obj)
+    path = '/v1.0/lists' + path
+    query = [query]
+    path_request = query.empty? ? path : path + URI.encode_www_form(query)
+    response = @access_token.request(type, path_request, json_obj)
     response = JSON.parse(response.body) unless response.class == String
-    return response
+    response
   end
 
-  private :sendRequest
-
-
+  private :send_request
 end
