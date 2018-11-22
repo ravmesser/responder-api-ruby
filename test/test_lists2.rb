@@ -6,7 +6,7 @@ require 'yaml'
 class ResponderTest < Minitest::Test
   def test_edit_list
     new_list = {
-      "DESCRIPTION": 'The New List',
+      "DESCRIPTION": 'New Test List',
       "REMOVE_TITLE": 'Bye Bye! New',
       "SITE_NAME": 'tocodenew',
       "SITE_URL": 'http://www.espondernew.co.il',

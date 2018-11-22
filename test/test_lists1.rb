@@ -69,6 +69,12 @@ class ResponderTest < Minitest::Test
     @personal_fields_ids = res['CREATED_PERSONAL_FIELDS'] if assert(res['EXISTING_PERSONAL_FIELD_NAMES'].empty?, "EXISTING_PERSONAL_FIELD_NAMES isn't empty in create_personal_fields() ")
   end
 
+  def teardown
+    res = @responder.delete_list(@list_id)
+
+    assert(res['DELETED_LIST_ID'] == @list_id, "the list doesn't deleted") if assert(res.class == Hash, 'this is not Hash class')
+  end
+
   def test_get_list
     res = @responder.get_list(@list_id)
     assert(res['INVALID_LIST_IDS'].empty?, "the list doesn't exist") if assert(res.class == Hash, 'this is not Hash class')
