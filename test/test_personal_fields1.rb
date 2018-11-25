@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'pp'
-require 'responder-api'
+require 'rav-meser-api'
 require 'yaml'
 
-class ResponderTest < Minitest::Test
+class RavMeserTest < Minitest::Test
   def test_create_personal_fileds_error
     error_personal_fields = {}
     res = @responder.create_personal_fields(@list_id, error_personal_fields)

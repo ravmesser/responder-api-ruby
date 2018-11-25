@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'pp'
-require 'responder-api'
+require 'rav-meser-api'
 require 'yaml'
 
-class ResponderTest < Minitest::Test
+class RavMeserTest < Minitest::Test
   def test_get_personal_fileds
     res = @responder.get_personal_fields(@list_id)
     return unless assert(res.class == Hash, 'this is not Hash class')

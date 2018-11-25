@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'pp'
-require 'responder-api'
+require 'rav-meser-api'
 require 'yaml'
 
-class ResponderTest < Minitest::Test
+class RavMeserTest < Minitest::Test
   def test_delete_subscribers
     delete_subscribers = {
       0 => { 'EMAIL': 'sub1@email.com' },

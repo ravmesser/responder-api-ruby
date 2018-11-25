@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'pp'
-require 'responder-api'
+require 'rav-meser-api'
 require 'yaml'
 
-class ResponderTest < Minitest::Test
+class RavMeserTest < Minitest::Test
   def test_get_subscribers
     res = @responder.get_subscribers(@list_id)
     return unless assert(res.class == Array, 'this is not Hash class')

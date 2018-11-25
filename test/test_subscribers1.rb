@@ -1,9 +1,9 @@
 require 'minitest/autorun'
 require 'pp'
-require 'responder-api'
+require 'rav-meser-api'
 require 'yaml'
 
-class ResponderTest < Minitest::Test
+class RavMeserTest < Minitest::Test
   def test_create_subscribers_error
     error_subscriber = {}
     res = @responder.create_subscribers(@list_id, error_subscriber)

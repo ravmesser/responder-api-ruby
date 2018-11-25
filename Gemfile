@@ -1,3 +1,3 @@
 source "https://rubygems.org"
 
-gem "responder-api", path: "../responder-api-ruby/"
+gem "rav-meser-api", path: "../rav-meser-api-ruby/"
