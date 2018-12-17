@@ -189,6 +189,46 @@ class RavMeser
     send_request(:post, 'personal_fields', '/' + id.to_s + '/personal_fields?', %w[method delete], args)
   end
 
+  # create new message to specific list
+  #
+  # Example:
+  #   >> RavMeser.create_message(123456, {'TYPE' => 1, 'BODY_TYPE' => 0, 'SUBJECT' => 'subject2', 'BODY' => 'message HTML body'} )
+  #   => {"ERRORS"=>[], "MESSAGE_ID"=>3586177}
+  #
+  # Arguments:
+  #   id: (int)
+  #   args: (Hash)
+  def create_message(id, args)
+    send_request(:post, 'info', '/' + id.to_s + '/messages', [], args)
+  end
+
+  # send message of specific list
+  #
+  # Example:
+  #   >> RavMeser.send_message(123456, 565656)
+  #   => {"MESSAGE_SENT"=>true}
+  #
+  # Arguments:
+  #   list_id: (int)
+  #   msg_id: (int)
+  def send_message(list_id, msg_id)
+    send_request(:post, '', '/' + list_id.to_s + '/messages/' + msg_id.to_s , [], {} )
+  end
+
+  # create and send message of specific list
+  #
+  # Example:
+  #   >> RavMeser.create_and_send_message(123456, {'TYPE' => 1, 'BODY_TYPE' => 0, 'SUBJECT' => 'subject2', 'BODY' => 'message HTML body'})
+  #   => {"MESSAGE_SENT"=>true}
+  #
+  # Arguments:
+  #   list_id: (int)
+  #   args: (Hash)
+  def create_and_send_message(id, msg)
+    res = create_message(id, msg)
+    send_message(id, res["MESSAGE_ID"])
+  end
+
   # privare method
   # common code to send the requests
   #
