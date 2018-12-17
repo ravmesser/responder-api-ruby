@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'rav-meser-api'
-  s.version     = '1.0.1'
+  s.version     = '1.0.2'
   s.date        = '2018-11-25'
   s.summary     = 'Rav Meser API'
   s.description = 'Rav Meser API Ruby'
