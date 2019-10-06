@@ -1,7 +1,4 @@
 .vscode/
 commands.txt
 /tests
-/tests/tokens.rb
-/test/tokens.rb
-/tests/tokens.yml
 /test/tokens.yml
