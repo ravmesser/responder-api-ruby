@@ -1,3 +1,4 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "rav-meser-api", path: "../rav-meser-api-ruby/"
+gem 'oauth', '~> 0.5.4'
+gem 'rav-meser-api', path: '../rav-meser-api-ruby/'

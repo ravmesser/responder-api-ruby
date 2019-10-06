@@ -4,6 +4,7 @@ require 'json'
 require 'optparse'
 require 'pp'
 require 'uri'
+require 'pry'
 
 # gem class name RavMeser
 class RavMeser
@@ -27,7 +28,7 @@ class RavMeser
   # get all the lists
   #
   # Example:
-  #   >> ה.get_lists()
+  #   >> RavMeser.get_lists()
   #   => { "LISTS" => [{}, {}, ... ] }
   #
   def get_lists
@@ -101,7 +102,7 @@ class RavMeser
   #
   # Example:
   #   >> RavMeser.create_subscribers(123456, {0 => {'EMAIL': "sub1@email.com", 'NAME': "sub1"}, 1 => {'EMAIL': "sub2@email.com", 'NAME': "sub2"}} )
-  #   => {"SUBSCRIBERS_CREATED": [], "EMAILS_INVALID": [], "EMAILS_EXISTING": ["johnsmith@gmail.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {}, "ERRORS" : [] }
+  #   => {"SUBSCRIBERS_CREATED": [112233], "EMAILS_INVALID": [], "EMAILS_EXISTING": ["sub1@email.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {}, "ERRORS" : [] }
   #
   # Arguments:
   #   id: (int)
@@ -114,7 +115,7 @@ class RavMeser
   #
   # Example:
   #   >> RavMeser.edit_subscribers(123456, {0 => {'IDENTIFIER': "sub1@email.com", 'NAME': "sub1NewName"}, 1 => {'IDENTIFIER': "sub2", 'NAME': "sub2"}} )
-  #   => {"SUBSCRIBERS_UPDATED": [], "INVALID_SUBSCRIBER_IDENTIFIERS": [], "EMAILS_INVALID": [], "EMAILS_EXISTED": ["johnsmith@gmail.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }}
+  #   => {"SUBSCRIBERS_UPDATED": [112233], "INVALID_SUBSCRIBER_IDENTIFIERS": ["sub1@email.com"], "EMAILS_INVALID": [], "EMAILS_EXISTED": [], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }
   #
   # Arguments:
   #   id: (int)
@@ -135,6 +136,51 @@ class RavMeser
   def delete_subscribers(id, args)
     send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers?', %w[method delete], args)
   end
+
+  # create new subscribers in specific list and update subscribers that exists
+  #
+  # Example:
+  #   >> RavMeser.upsert_subscribers(123456, {0 => {'EMAIL': "sub1@email.com", 'NAME': "sub1"}, 1 => {'EMAIL': "sub2@email.com", 'NAME': "sub2"}} )
+  #   => [{"SUBSCRIBERS_CREATED": [112233], "EMAILS_INVALID": [], "EMAILS_EXISTING": ["sub1@email.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {}, "ERRORS" : [] },
+  #      {"SUBSCRIBERS_UPDATED": [223344], "INVALID_SUBSCRIBER_IDENTIFIERS": [], "EMAILS_INVALID": [], "EMAILS_EXISTED": [], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }]
+  #
+  # Arguments:
+  #   id: (int)
+  #   args: (Hash)
+  def upsert_subscribers(id, args = {})
+    create_response = send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+
+    update_args = {}
+    create_response['EMAILS_EXISTING'].each_with_index do |email, index|
+      update_args[index] = get_subscriber_args_and_set_identifier(args, email)
+    end
+    edit_response = send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], update_args)
+
+    [create_response, edit_response]
+  end
+
+  # create new subscriber in specific list - update the subscriber if already exists
+  #
+  # Example:
+  #   >> RavMeser.upsert_subscriber(123456, {0 => {'EMAIL': "sub1@email.com", 'NAME': "sub1"} )
+  #   => [{"SUBSCRIBERS_CREATED": [], "EMAILS_INVALID": [], "EMAILS_EXISTING": ["sub1@email.com"], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {}, "ERRORS" : [] },
+  #      {"SUBSCRIBERS_UPDATED": [223344], "INVALID_SUBSCRIBER_IDENTIFIERS": [], "EMAILS_INVALID": [], "EMAILS_EXISTED": [], "EMAILS_BANNED": [], "PHONES_INVALID": [], "PHONES_EXISTING": [], "BAD_PERSONAL_FIELDS": {} }]
+  #
+  # Arguments:
+  #   id: (int)
+  #   args: (Hash)
+  def upsert_subscriber(id, args = {})
+    return { error: 'Too many subscribers' } unless args.length == 1
+
+    create_response = send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+    if create_response['EMAILS_EXISTING'].length == 1
+      args[0][:IDENTIFIER] = args[0].delete(:EMAIL)
+      edit_response = send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+    end
+
+    [create_response, edit_response || {}]
+  end
+
 
   # <!----------- PERSONAL FIELDS -----------!>
 
@@ -226,10 +272,12 @@ class RavMeser
   #   args: (Hash)
   def create_and_send_message(id, msg)
     res = create_message(id, msg)
-    send_message(id, res["MESSAGE_ID"])
+    send_message(id, res['MESSAGE_ID'])
   end
 
-  # privare method
+  private
+
+  # private method
   # common code to send the requests
   #
   # Example:
@@ -255,5 +303,12 @@ class RavMeser
     response
   end
 
-  private :send_request
+  def get_subscriber_args_and_set_identifier(args, email)
+    args.each do |_, v|
+      if v[:EMAIL] == email
+        v[:IDENTIFIER] = v.delete(:EMAIL)
+        return v
+      end
+    end
+  end
 end
