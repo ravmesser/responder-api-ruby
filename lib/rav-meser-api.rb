@@ -2,9 +2,9 @@ require 'rubygems'
 require 'oauth'
 require 'json'
 require 'optparse'
-require 'pp'
 require 'uri'
-require 'pry'
+# require 'pp'
+# require 'pry'
 
 # gem class name RavMeser
 class RavMeser
