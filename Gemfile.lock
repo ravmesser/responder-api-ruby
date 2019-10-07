@@ -1,19 +1,30 @@
 PATH
   remote: .
   specs:
-    rav-meser-api (1.0.5)
-      oauth (= 0.5.4)
+    rav-meser-api (1.0.9)
+      json (~> 2.2)
+      oauth (~> 0.5.4)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.2)
+    json (2.2.0)
+    method_source (0.8.2)
     oauth (0.5.4)
+    pry (0.10.4)
+      coderay (~> 1.1.0)
+      method_source (~> 0.8.1)
+      slop (~> 3.4)
+    slop (3.6.0)
 
 PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
+  json (~> 2.2)
   oauth (~> 0.5.4)
+  pry (~> 0.10.3)
   rav-meser-api!
 
 BUNDLED WITH
