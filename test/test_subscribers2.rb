@@ -119,4 +119,28 @@ class RavMeserTest < Minitest::Test
 
     assert(create_response['SUBSCRIBERS_CREATED'].length == 1, " create_subscribers() doesn't success")
   end
+
+  def test_upsert_subscriber_to_fail
+    many_subscribers = {
+      0 => {
+        'EMAIL': 'sub3@email.com',
+        'NAME': 'sub3',
+        'PHONE': '0501234567'
+      },
+      1 => {
+        'EMAIL': 'sub2@email.com',
+        'NAME': 'sub2',
+        'PHONE': '0501234568'
+      }
+    }
+    error = nil
+    begin
+      res = @responder.upsert_subscriber(@list_id, many_subscribers)
+    rescue => exception
+      error = exception
+    end
+
+    assert_nil(res)
+    assert_equal(error.message, 'Too many subscribers')
+  end
 end
