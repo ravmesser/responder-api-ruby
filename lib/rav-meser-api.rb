@@ -148,13 +148,19 @@ class RavMeser
   #   id: (int)
   #   args: (Hash)
   def upsert_subscribers(id, args = {})
-    create_response = send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+    raise 'Too few subscribers' if args.length.zero?
 
-    update_args = {}
-    create_response['EMAILS_EXISTING'].each_with_index do |email, index|
-      update_args[index] = get_subscriber_args_and_set_identifier(args, email)
+    create_response = send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+    raise "ERRORS: #{create_response['ERRORS']}" unless create_response['ERRORS'].empty?
+
+    edit_response = {}
+    unless create_response['EMAILS_EXISTING'].empty?
+      update_args = {}
+      create_response['EMAILS_EXISTING'].each_with_index do |email, index|
+        update_args[index] = get_subscriber_args_and_set_identifier(args, email)
+      end
+      edit_response = send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], update_args)
     end
-    edit_response = send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], update_args)
 
     [create_response, edit_response]
   end
@@ -170,17 +176,19 @@ class RavMeser
   #   id: (int)
   #   args: (Hash)
   def upsert_subscriber(id, args = {})
-    return { error: 'Too many subscribers' } unless args.length == 1
+    raise 'Too many subscribers' unless args.length == 1
 
+    edit_response = {}
     create_response = send_request(:post, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
+    raise "ERRORS: #{create_response['ERRORS']}" unless create_response['ERRORS'].empty?
+
     if create_response['EMAILS_EXISTING'].length == 1
       args[0][:IDENTIFIER] = args[0].delete(:EMAIL)
       edit_response = send_request(:put, 'subscribers', '/' + id.to_s + '/subscribers', [], args)
     end
 
-    [create_response, edit_response || {}]
+    [create_response, edit_response]
   end
-
 
   # <!----------- PERSONAL FIELDS -----------!>
 
@@ -299,7 +307,12 @@ class RavMeser
     query = [query]
     path_request = query.empty? ? path : path + URI.encode_www_form(query)
     response = @access_token.request(type, path_request, json_obj)
-    response = JSON.parse(response.body) unless response.class == String
+
+    begin
+      response = JSON.parse(response.body)
+    rescue StandardError => e
+      raise "RavMeser API return invalid response.\n#{e}"
+    end
     response
   end
 
