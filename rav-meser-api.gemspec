@@ -1,11 +1,11 @@
 Gem::Specification.new do |s|
   s.name = 'rav-meser-api'
-  s.version     = '1.0.11'
+  s.version     = '1.0.12'
   s.date        = '2019-10-06'
   s.summary     = 'Rav Meser API'
   s.description = 'Rav Meser API Ruby'
-  s.authors     = ['Itamar Davidyan']
-  s.email       = 'itamardavidyan@gmail.com'
+  s.authors     = ['Ynon Perek']
+  s.email       = 'ynon@ynonperek.com'
   s.files       = ['lib/rav-meser-api.rb']
   s.add_runtime_dependency 'json', '~> 2.2'
   s.add_runtime_dependency 'oauth', '~> 0.5.4'

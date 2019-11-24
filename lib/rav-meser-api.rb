@@ -283,6 +283,21 @@ class RavMeser
     send_message(id, res['MESSAGE_ID'])
   end
 
+  
+  def send_any_request(type, path, query='')
+    path = '/v1.0/' + path
+    query = [query]
+    path_request = query.empty? ? path : path + URI.encode_www_form(query)
+    response = @access_token.request(type, path_request)
+
+    begin
+      response = JSON.parse(response.body)
+    rescue StandardError => e
+      raise "RavMeser API return invalid response.\n#{e}"
+    end
+    response
+  end
+
   private
 
   # private method
