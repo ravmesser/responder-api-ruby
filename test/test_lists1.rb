@@ -6,7 +6,7 @@ require 'yaml'
 class RavMeserTest < Minitest::Test
   def setup
     tokens = YAML.load_file('./test/tokens.yml')
-    @responder = RavMeser.new(tokens['client_key'], tokens['client_secret'], tokens['user_key'], tokens['user_secret'])
+    @responder = RavMeser.new(tokens['client_key'], tokens['client_secret'], tokens['user_key'], tokens['user_secret'], 'http://new-api.responder.co.il/v1.0')
     # create list
     new_list = {
       "DESCRIPTION": 'Test List',
