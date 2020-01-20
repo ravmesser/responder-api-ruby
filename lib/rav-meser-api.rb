@@ -18,8 +18,10 @@ class RavMeser
   #   client_secret: (String) Client Secret
   #   user_key: (String) User Key
   #   user_secret: (String) User Secret
-  def initialize(client_key, client_secret, user_key, user_secret)
-    consumer = OAuth::Consumer.new(client_key, client_secret, site: 'http://api.responder.co.il')
+  #.  endpoint: (String) Api endpoint
+  def initialize(client_key, client_secret, user_key, user_secret, endpoint = nil)
+    endpoint ||= 'http://api.responder.co.il/v1.0'
+    consumer = OAuth::Consumer.new(client_key, client_secret, site: endpoint)
     @access_token = OAuth::AccessToken.new(consumer, user_key, user_secret)
   end
 
@@ -283,9 +285,9 @@ class RavMeser
     send_message(id, res['MESSAGE_ID'])
   end
 
-  
+
   def send_any_request(type, path, query='')
-    path = '/v1.0/' + path
+    path = '/' + path
     query = [query]
     path_request = query.empty? ? path : path + URI.encode_www_form(query)
     response = @access_token.request(type, path_request)
@@ -318,7 +320,7 @@ class RavMeser
         JSON.generate(args) }
     end
 
-    path = '/v1.0/lists' + path
+    path = '/lists' + path
     query = [query]
     path_request = query.empty? ? path : path + URI.encode_www_form(query)
     response = @access_token.request(type, path_request, json_obj)
