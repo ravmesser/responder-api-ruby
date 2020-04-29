@@ -94,10 +94,13 @@ class RavMeser
   #   >> RavMeser.get_subscribers(123456)
   #   => [{}, {}, ... ]
   #
+  #   >> RavMeser.get_subscribers(123456, {limit: 5, offset:10})
+  #   => [{}, {}, ... ]
+  #
   # Arguments:
   #   id: (int)
-  def get_subscribers(id)
-    send_request(:get, '', '/' + id.to_s + '/subscribers', [], {})
+  def get_subscribers(id, query = {})
+    send_request(:get, '', '/' + id.to_s + '/subscribers?', query, {})
   end
 
   # create new subscribers in specific list
@@ -324,7 +327,7 @@ class RavMeser
     end
 
     path = '/lists' + path
-    query = [query]
+    query = [query] unless query.is_a?(Hash)
     path_request = query.empty? ? path : path + URI.encode_www_form(query)
     response = @access_token.request(type, path_request, json_obj)
 
