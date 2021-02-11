@@ -326,7 +326,7 @@ class RavMeser
     begin
       response = JSON.parse(response.body)
     rescue StandardError => e
-      raise "RavMeser API return invalid response.\n#{e}"
+      raise e, response.body
     end
     response
   end
