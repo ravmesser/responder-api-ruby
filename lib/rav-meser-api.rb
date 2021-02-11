@@ -3,7 +3,7 @@ require 'oauth'
 require 'json'
 require 'optparse'
 require 'uri'
-# require 'pp'
+require 'pp'
 # require 'pry'
 
 # gem class name RavMeser
@@ -326,6 +326,9 @@ class RavMeser
     begin
       response = JSON.parse(response.body)
     rescue StandardError => e
+      if ENV['RAV_MESER_DEBUG']
+        pp "Response was: ", response, response.body
+      end
       raise e, response.body
     end
     response
