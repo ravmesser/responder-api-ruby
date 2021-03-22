@@ -289,11 +289,65 @@ class RavMeser
   end
 
 
-  def send_any_request(type, path, query='')
+  # <!-----------WEBHOOKS -----------!>
+
+  # create a new webhook
+  #
+  # Example:
+  #   >> RavMeser.create_webhook('https://test.schooler.biz', '123456')
+  #   => {"webhooks_created"=>['123456'], "webhooks_exists"=>[], "invalid_list_ids"=>[], "invalid_urls"=>[]}
+  #
+  # Arguments:
+  #   url: (String)
+  #   list_id: (String)
+  def create_webhook(url, list_id)
+    args = [{url: url, list_id: list_id}]
+    webhook_request(:post, 'webhooks', '', [], args)
+  end
+
+  # get webhook lists
+  #
+  # Example:
+  #   >> RavMeser.get_webhooks()
+  #   >> RavMeser.get_webhooks(list_id: '123123')
+  #   => {"webhooks"=>[{"id"=>"1000037", "list_id"=>"123123", "url"=>"https://...", "token"=>"XmuNeZt...", "active"=>"1"}]}
+  #
+  # Arguments:
+  #   args: (Hash)
+  def get_webhooks(list_id: '0', active: 1)
+    webhook_request(:get, '', "?list_id=#{list_id}&active=#{active}", [], {})
+  end
+
+  # update webhooks lists
+  #
+  # Example:
+  #   >> RavMeser.update_webhooks([{ url: '...', list_id: '...', id: '...' }])
+  #   => {"webhooks_updated"=>[{"id"=>"1000037", "list_id"=>"123123", "url"=>"https://....", "token"=>"XmuNe...", "active"=>"1"}], "invalid_webhook_ids"=>[], "invalid_list_ids"=>[], "invalid_urls"=>[]}
+  #
+  # Arguments:
+  #   args: (Array)
+  def update_webhooks(args)
+    webhook_request(:put, 'webhooks', '', [], args)
+  end
+
+  # delete a webhook
+  #
+  # Example:
+  #   >> RavMeser.delete_webhooks(10000037)
+  #   => {"webhooks_deleted"=>[{"id"=>"1000037", "list_id"=>"123123", "url"=>"https://....", "token"=>"XmuNeZ...", "active"=>"0"}], "invalid_webhook_ids"=>[]}
+  #
+  # Arguments:
+  #   args: (Array)
+  def delete_webhook(webhook_id)
+    query = [{id: webhook_id}].to_json
+    webhook_request(:delete, '', "?webhooks=#{query}", [], {})
+  end
+
+  def send_any_request(type, path, query = '', args = {})
     path = '/' + path
     query = [query]
     path_request = query.empty? ? path : path + URI.encode_www_form(query)
-    response = @access_token.request(type, path_request)
+    response = @access_token.request(type, path_request, args)
 
     begin
       response = JSON.parse(response.body)
@@ -343,5 +397,36 @@ class RavMeser
         return v
       end
     end
+  end
+
+  # private method
+  # common code to send the requests
+  #
+  # Example:
+  #   >> webhook_request(:get, 'info', '?list_ids=123456', {} )
+  #   => {}
+  #
+  # Arguments:
+  #   type: (:get \ :post \ :put \  :delete)
+  #   object_name: (string) - ('webhooks')
+  #   query: (Array)
+  #   args: (Hash)
+  def webhook_request(type, object_name = '', path = '', query = [], args = {})
+    unless args == {}
+      json_obj = { object_name =>
+        JSON.generate(args) }
+    end
+
+    path = '/webhooks' + path
+    query = [query] unless query.is_a?(Hash)
+    path_request = query.empty? ? path : path + URI.encode_www_form(query)
+    response = @access_token.request(type, path_request, json_obj)
+
+    begin
+      response = JSON.parse(response.body)
+    rescue StandardError => e
+      raise "RavMeser API return invalid response.\n#{e}"
+    end
+    response
   end
 end
