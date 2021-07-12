@@ -68,7 +68,7 @@ class RavMeser
   #   => {"ERRORS"=>[], "INVALID_EMAIL_NOTIFY"=>[], "INVALID_LIST_IDS"=>[], "SUCCESS"=>true}
   #
   # Arguments:
-  #   id: (int)
+  #   id: (String)
   #   args: (Hash)
   def edit_list(id, args = {})
     send_request(:put, 'info', '/' + id.to_s, [], args)
@@ -313,7 +313,7 @@ class RavMeser
   #   => {"webhooks"=>[{"id"=>"1000037", "list_id"=>"123123", "url"=>"https://...", "token"=>"XmuNeZt...", "active"=>"1"}]}
   #
   # Arguments:
-  #   args: (Hash)
+  #   args: {list_id: (String), active: (int)}
   def get_webhooks(list_id: '0', active: 1)
     webhook_request(:get, '', "?list_id=#{list_id}&active=#{active}", [], {})
   end
@@ -337,7 +337,7 @@ class RavMeser
   #   => {"webhooks_deleted"=>[{"id"=>"1000037", "list_id"=>"123123", "url"=>"https://....", "token"=>"XmuNeZ...", "active"=>"0"}], "invalid_webhook_ids"=>[]}
   #
   # Arguments:
-  #   args: (Array)
+  #   webhook_id: (String)
   def delete_webhook(webhook_id)
     query = [{id: webhook_id}].to_json
     webhook_request(:delete, '', "?webhooks=#{query}", [], {})
