@@ -4,7 +4,6 @@ require 'json'
 require 'optparse'
 require 'uri'
 require 'pp'
-# require 'rest_client'
 
 RAV_MESER_ENDPOINT = 'http://api.responder.co.il/'
 # gem class name RavMeser
