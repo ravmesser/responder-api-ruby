@@ -4,8 +4,9 @@ require 'json'
 require 'optparse'
 require 'uri'
 require 'pp'
-# require 'pry'
+# require 'rest_client'
 
+RAV_MESER_ENDPOINT = 'http://api.responder.co.il/'
 # gem class name RavMeser
 class RavMeser
   # initialize new RavMeser Object
@@ -20,7 +21,7 @@ class RavMeser
   #   user_secret: (String) User Secret
   #.  endpoint: (String) Api endpoint
   def initialize(client_key, client_secret, user_key, user_secret, endpoint = nil)
-    endpoint ||= 'http://api.responder.co.il/v1.0'
+    endpoint ||= "#{RAV_MESER_ENDPOINT}v1.0"
     consumer = OAuth::Consumer.new(client_key, client_secret, site: endpoint)
     @access_token = OAuth::AccessToken.new(consumer, user_key, user_secret)
   end
@@ -341,6 +342,47 @@ class RavMeser
   def delete_webhook(webhook_id)
     query = [{id: webhook_id}].to_json
     webhook_request(:delete, '', "?webhooks=#{query}", [], {})
+  end
+
+  # Get user tokens by rav meser user id
+  #
+  # Example:
+  #   >> RavMeser.get_tokens(1A3W24R5T6Y7U7U8I9O0P, 1A3W24R5T6Y7U7U8I9O0P, 123456)
+  #   => {"TOKENS"=>{"KEY"=>"62C5AA89820E88B528BBC170D005DB5B", "SECRET"=>"8662F470B81B73E635BA6CCA9D47A1CD"}}
+  #
+  # Arguments:
+  #   client_key: (String) Client Key
+  #   client_secret: (String) Client Secret
+  #   user_id: (Number) Rav Meser user id
+  def self.get_tokens(client_key, client_secret, user_id)
+
+    nonce  = Digest::MD5.hexdigest(OAuth::Helper.generate_key)
+    authorization_values = []
+    authorization_values.push("c_key=#{client_key}")
+    authorization_values.push("c_secret=#{Digest::MD5.hexdigest(client_secret + nonce)}")
+    authorization_values.push("nonce=#{nonce}")
+    authorization_values.push("timestamp=#{OAuth::Helper.generate_timestamp}")
+    authorization_values.push("oauth_user_id=#{user_id.to_s}")
+
+    headers = { 'Authorization' => authorization_values.join(',')}
+    
+    response_as_json = {
+      "TOKENS"=>{
+        "KEY" => nil, 
+        "SECRET" => nil
+      }
+    }
+    begin
+      uri = URI.parse("#{RAV_MESER_ENDPOINT}main/users/tokens")
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      request = Net::HTTP::Post.new(uri.path, headers)
+      response = http.request(request)
+      response_as_json = JSON.parse(response.body) if response.is_a?(Net::HTTPSuccess)
+    rescue 
+    end
+
+    response_as_json
   end
 
   def send_any_request(type, path, query = '', args = {})
