@@ -5,7 +5,7 @@ require 'optparse'
 require 'uri'
 require 'pp'
 
-RAV_MESER_ENDPOINT = 'http://api.responder.co.il/'
+RAV_MESER_ENDPOINT = 'https://api.responder.co.il/'
 # gem class name RavMeser
 class RavMeser
   # initialize new RavMeser Object
