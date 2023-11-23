@@ -374,6 +374,7 @@ class RavMeser
     begin
       uri = URI.parse("#{RAV_MESER_ENDPOINT}main/users/tokens")
       http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
 
       request = Net::HTTP::Post.new(uri.path, headers)
       response = http.request(request)
